@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spectra '26 | Student Tech Symposium</title>
+  <meta name="description" content="Spectra '26 – browse events, build your schedule and register for a two-day student tech symposium.">
+  <meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121117" media="(prefers-color-scheme: dark)">
+
+  <!--
+    Runs before anything else loads:
+    1. Works out the app's root folder (e.g. "/" locally, "/week5-spa/" on
+       GitHub Pages) and adds a <base> tag, so css/, js/ and data/ load
+       correctly even when the address bar shows a deep URL like /events/3.
+    2. Applies the saved theme so there is no flash of the wrong colours.
+  -->
+  <script>
+    (function () {
+      var d = document, l = location, root = '/';
+      if (l.protocol !== 'file:') {
+        var fromRedirect = null, saved = null;
+        try { fromRedirect = sessionStorage.getItem('spa-root'); saved = localStorage.getItem('spa-root'); } catch (e) {}
+        // If the URL contains one of the app's routes (/events/3, /about…), the root is
+        // everything before it. This matters on hosts that serve index.html for every path.
+        var known = l.pathname.match(/^(.*?\/)(?:events|schedule|my-schedule|register|about)(?:\/|$)/);
+        root = fromRedirect                                                    // arrived via 404.html
+          || (known && known[1])                                               // deep link to a known route
+          || (saved && l.pathname.indexOf(saved) === 0 && saved)              // root remembered from last visit
+          || l.pathname.replace(/[^/]*$/, '');                                 // folder that contains index.html
+        try { localStorage.setItem('spa-root', root); sessionStorage.removeItem('spa-root'); } catch (e) {}
+        var base = d.createElement('base');
+        base.href = root;
+        d.head.appendChild(base);
+      }
+      window.__SPA_ROOT__ = root;
+
+      var t = null;
+      try { t = JSON.parse(localStorage.getItem('spectra-theme')); } catch (e) {}
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      d.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c2410c'/%3E%3Ctext x='16' y='23' font-family='Arial' font-weight='700' font-size='20' fill='white' text-anchor='middle'%3ES%3C/text%3E%3C/svg%3E">
+
+  <!--
+    CSS, fonts and scripts are written by this script instead of being plain tags.
+    Reason: the browser's preload scanner reads plain tags *before* the <base> tag
+    above exists, so on a deep URL like /events/4 it would first request
+    /events/css/style.css (wrong) and then /css/style.css — every file twice.
+    Tags written here are only seen after <base> is set, so each loads once.
+  -->
+  <script>
+    document.write([
+      '<link rel="preload" href="fonts/space-grotesk-700-latin.woff2" as="font" type="font/woff2" crossorigin>',
+      '<link rel="preload" href="fonts/inter-var-latin.woff2" as="font" type="font/woff2" crossorigin>',
+      '<link rel="stylesheet" href="css/style.css">'
+    ].concat([
+      'core/utils', 'core/store', 'core/api', 'core/router',
+      'views/components', 'views/home', 'views/events', 'views/event-detail',
+      'views/schedule', 'views/register', 'views/about', 'app'
+    ].map(function (f) { return '<script src="js/' + f + '.js" defer><\/script>'; })).join(''));
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#app">Skip to main content</a>
+
+  <!-- Thin bar shown while a view is loading its data -->
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <!-- ============ APP SHELL: stays on screen; only <main> changes ============ -->
+  <header class="site-header" id="siteHeader">
+    <nav class="nav container" aria-label="Main">
+      <a class="logo" data-to="/" href="./">Spectra<span>'26</span></a>
+
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </button>
+
+      <ul class="nav-menu" id="navMenu">
+        <li><a class="nav-link" data-to="/events" data-nav="/events" href="events">Events</a></li>
+        <li><a class="nav-link" data-to="/schedule" data-nav="/schedule" href="schedule">Schedule</a></li>
+        <li><a class="nav-link" data-to="/my-schedule" data-nav="/my-schedule" href="my-schedule" id="myScheduleLink">My Schedule <span class="badge" id="savedCount" hidden>0</span></a></li>
+        <li><a class="nav-link" data-to="/about" data-nav="/about" href="about">About</a></li>
+        <li><a class="nav-link nav-cta" data-to="/register" data-nav="/register" href="register">Register</a></li>
+        <li>
+          <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">
+            <span class="visually-hidden">Dark mode</span>
+            <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+            <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="5" fill="currentColor"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 1v3M12 20v3M1 12h3M20 12h3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- The router renders each view in here -->
+  <main id="app" class="view" tabindex="-1">
+    <noscript>
+      <div class="container narrow status-card">
+        <h1>Spectra '26 needs JavaScript</h1>
+        <p>This site is a single page application, so it uses JavaScript to show each page. Please turn JavaScript on, or email hello@spectra.example to register.</p>
+      </div>
+    </noscript>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© 2026 Spectra · A single page application built with HTML, CSS and plain JavaScript.</p>
+    </div>
+  </footer>
+
+  <!-- Screen-reader announcements for page changes (visually hidden) -->
+  <div class="visually-hidden" id="announcer" aria-live="polite" aria-atomic="true"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

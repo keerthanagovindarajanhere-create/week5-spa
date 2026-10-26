@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting… | Spectra '26</title>
+  <meta name="robots" content="noindex">
+  <!--
+    Why this file exists:
+    Static hosts like GitHub Pages only know about real files. If someone
+    opens or refreshes a deep link such as /week5-spa/events/3, there is no
+    file at that path, so the host serves this 404 page instead.
+
+    This script remembers the path the visitor wanted, sends them to the
+    app's index.html, and the router puts the original URL back in the
+    address bar and shows the right view. The visitor never sees this page.
+  -->
+  <script>
+    (function () {
+      var l = location, root = null;
+
+      // 1. The root the app saved the last time it loaded on this site.
+      try {
+        var saved = localStorage.getItem('spa-root');
+        if (saved && l.pathname.indexOf(saved) === 0) root = saved;
+      } catch (e) {}
+
+      // 2. Otherwise: GitHub Pages project sites live under /<repo-name>/.
+      if (!root) {
+        var first = l.pathname.split('/')[1] || '';
+        root = /\.github\.io$/.test(l.hostname) && first ? '/' + first + '/' : '/';
+      }
+
+      try {
+        sessionStorage.setItem('spa-root', root);
+        sessionStorage.setItem('spa-redirect', l.pathname.slice(root.length) + l.search + l.hash);
+      } catch (e) {}
+      l.replace(root);
+    })();
+  </script>
+</head>
+<body>
+  <p>Redirecting to <a href="./">Spectra '26</a>…</p>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" font-family="Inter, Segoe UI, Arial, sans-serif">
+  <title>Spectra '26 SPA architecture</title>
+  <desc>How a navigation flows: the address bar and links go to the router, the router calls app.js, app.js asks the matching view to load, render and mount, views get data from the API layer and shared state from the store.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#57555f"/></marker>
+    <style>
+      .box{fill:#fff;stroke:#1c1b22;stroke-width:1.5}
+      .hl{fill:#fff1e8;stroke:#c2410c;stroke-width:2}
+      .soft{fill:#f1efe9;stroke:#a9a59a;stroke-width:1.2;stroke-dasharray:5 4}
+      .t{font-size:16px;font-weight:700;fill:#1c1b22}
+      .s{font-size:12.5px;fill:#57555f}
+      .l{font-size:12px;fill:#57555f;font-style:italic}
+      .ln{stroke:#57555f;stroke-width:1.6;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="960" height="600" fill="#fbfaf7"/>
+
+  <!-- Inputs -->
+  <rect class="box" x="30" y="40" width="200" height="88" rx="12"/>
+  <text class="t" x="50" y="70">Browser</text>
+  <text class="s" x="50" y="92">Address bar · Back / Forward</text>
+  <text class="s" x="50" y="110">Clicks on &lt;a&gt; links</text>
+
+  <rect class="soft" x="30" y="170" width="200" height="88" rx="12"/>
+  <text class="t" x="50" y="200">404.html</text>
+  <text class="s" x="50" y="222">Deep link on GitHub Pages →</text>
+  <text class="s" x="50" y="240">redirect to index.html</text>
+
+  <!-- Router -->
+  <rect class="hl" x="300" y="40" width="282" height="118" rx="12"/>
+  <text class="t" x="320" y="70">router.js</text>
+  <text class="s" x="320" y="92">pushState · replaceState · popstate</text>
+  <text class="s" x="320" y="110">/events/:id → { view, params }</text>
+  <text class="s" x="320" y="128">history mode (http) · hash mode (file://)</text>
+  <text class="s" x="320" y="146">saves scroll position per entry</text>
+
+  <!-- App -->
+  <rect class="hl" x="620" y="40" width="310" height="140" rx="12"/>
+  <text class="t" x="640" y="70">app.js · handleRoute()</text>
+  <text class="s" x="640" y="92">1. load() → skeleton + progress bar</text>
+  <text class="s" x="640" y="110">2. drop stale navigations (navId)</text>
+  <text class="s" x="640" y="128">3. render() inside View Transition</text>
+  <text class="s" x="640" y="146">4. mount() → keep cleanup function</text>
+  <text class="s" x="640" y="164">5. title · nav · focus h1 · scroll · announce</text>
+
+  <!-- Views -->
+  <rect class="box" x="300" y="250" width="630" height="130" rx="12"/>
+  <text class="t" x="320" y="280">views/ — one object per page</text>
+  <text class="s" x="320" y="302">{ title(), load(), loading(), render(), mount() → cleanup, update() }</text>
+  <g font-size="12.5" fill="#1c1b22">
+    <rect x="320" y="318" width="80" height="40" rx="8" fill="#f1efe9"/><text x="360" y="343" text-anchor="middle">home</text>
+    <rect x="408" y="318" width="80" height="40" rx="8" fill="#f1efe9"/><text x="448" y="343" text-anchor="middle">events</text>
+    <rect x="496" y="318" width="96" height="40" rx="8" fill="#f1efe9"/><text x="544" y="343" text-anchor="middle">event-detail</text>
+    <rect x="600" y="318" width="84" height="40" rx="8" fill="#f1efe9"/><text x="642" y="343" text-anchor="middle">schedule</text>
+    <rect x="692" y="318" width="80" height="40" rx="8" fill="#f1efe9"/><text x="732" y="343" text-anchor="middle">register</text>
+    <rect x="780" y="318" width="132" height="40" rx="8" fill="#f1efe9"/><text x="846" y="343" text-anchor="middle">about · 404 · error</text>
+  </g>
+
+  <!-- API & store -->
+  <rect class="box" x="300" y="450" width="290" height="110" rx="12"/>
+  <text class="t" x="320" y="480">api.js</text>
+  <text class="s" x="320" y="502">Loads data/events.js on first use</text>
+  <text class="s" x="320" y="520">cache · shared in-flight request</text>
+  <text class="s" x="320" y="538">timeout · errors → error view · retry</text>
+
+  <rect class="box" x="640" y="450" width="290" height="110" rx="12"/>
+  <text class="t" x="660" y="480">store.js</text>
+  <text class="s" x="660" y="502">saved events · form draft · registration</text>
+  <text class="s" x="660" y="520">subscribe() → header badge, lists update</text>
+  <text class="s" x="660" y="538">localStorage + sync across tabs</text>
+
+  <rect class="soft" x="30" y="450" width="180" height="110" rx="12"/>
+  <text class="t" x="50" y="480">data/events.js</text>
+  <text class="s" x="50" y="502">12 events, 2 days</text>
+  <text class="s" x="50" y="520">not part of first load</text>
+
+  <!-- Arrows -->
+  <path class="ln" d="M230 84H296"/>
+  <path class="ln" d="M230 214C265 214 270 140 296 130"/>
+  <path class="ln" d="M582 98H616"/>
+  <path class="ln" d="M775 180V246"/>
+  <path class="ln" d="M445 380V446"/>
+  <path class="ln" d="M785 380V446"/>
+  <path class="ln" d="M296 505H214"/>
+  <text class="l" x="226" y="496">injects</text>
+  <text class="l" x="455" y="420">await data</text>
+  <text class="l" x="795" y="420">read · subscribe</text>
+  <text class="l" x="785" y="222">calls</text>
+</svg>
